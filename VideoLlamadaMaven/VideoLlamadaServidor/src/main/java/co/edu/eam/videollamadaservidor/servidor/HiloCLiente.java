@@ -4,7 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,11 +17,13 @@ public class HiloCLiente implements Runnable {
     private Socket con;
     private String ip;
     private Servidor servidor;
+    private HiloCLiente receptor;
 
     public HiloCLiente(Socket con, Servidor servidor) {
         super();
         this.con = con;
         this.servidor = servidor;
+        this.receptor = null;
     }
 
     @Override
@@ -35,6 +41,8 @@ public class HiloCLiente implements Runnable {
                 validarPeticion(peticion, salidaTxt);
                 //enviamos los clientes que estan conectados
                 enviarClientes(salidaTxt);
+                //validamos si hay que compartir video
+                validarVideo();
             }
         } catch (IOException ex) {
             Logger.getLogger(HiloCLiente.class.getName()).log(Level.SEVERE, null, ex);
@@ -42,14 +50,43 @@ public class HiloCLiente implements Runnable {
     }
 
     /**
+     * Método para que 2 clientes compartan video
+     * @throws SocketException
+     * @throws IOException 
+     */
+    private void validarVideo() throws SocketException, IOException {
+        if (receptor != null) {
+            //abrimos servidor
+            try (DatagramSocket socketIn = new DatagramSocket(45000)) {
+                byte[] buffer = new byte[10000];
+                //paquete dondre recibiremos 
+                DatagramPacket pktIn = new DatagramPacket(buffer, buffer.length);
+                //recibimos paquete
+                socketIn.receive(pktIn);
+                //lo convertimos en bytes para reenviarlo
+                byte[] bites = pktIn.getData();
+                //abrimos socket para enviar packete al cliente recpetor
+                try (DatagramSocket socketOut = new DatagramSocket()) {
+                    //creamos paquete a enviar al receptor
+                    DatagramPacket pktOut = new DatagramPacket(bites, bites.length, 
+                            InetAddress.getByName(receptor.getIp()), 45000);
+                    //enviamos paquete
+                    socketOut.send(pktOut);
+                }
+            }
+        }
+    }
+
+    /**
      * Método para validar la petición que el cliente le hace al servidor
+     *
      * @param peticion, peticion del cliente
      * @param salidaTxt, stream para enviarle la respuesta al cliente
-     * @throws IOException 
+     * @throws IOException
      */
     private void validarPeticion(String peticion, PrintStream salidaTxt) throws IOException {
         //validamos que exista una peticion
-        if (!peticion.isEmpty() && !peticion.equals("")) {            
+        if (!peticion.isEmpty() && !peticion.equals("")) {
             String[] p = peticion.split(":");
             //si la peticion es con, se busca el cliente con el que se realizara
             //la conexion de pantallas
@@ -67,6 +104,8 @@ public class HiloCLiente implements Runnable {
                 //verificamos que la respuesta sea ok
                 if (!resp.isEmpty() && !resp.equals("") && resp.equals("OK")) {
                     salidaTxt.println(resp);
+                    this.receptor = receptor;
+                    receptor.setReceptor(this);
                 } else {
                     salidaTxt.println("NO");
                 }
@@ -79,8 +118,10 @@ public class HiloCLiente implements Runnable {
     }
 
     /**
-     * Metodo para enviar a los clientes las ips de los demas clientes conectaodos
-     * @param salidaTxt 
+     * Metodo para enviar a los clientes las ips de los demas clientes
+     * conectaodos
+     *
+     * @param salidaTxt
      */
     private void enviarClientes(PrintStream salidaTxt) {
         String ips = "";
@@ -102,6 +143,7 @@ public class HiloCLiente implements Runnable {
 
     /**
      * Método para buscar un cliente
+     *
      * @param ip, ip del cliente a buscar
      * @return el HiloCliente
      */
@@ -130,5 +172,13 @@ public class HiloCLiente implements Runnable {
 
     public void setCon(Socket con) {
         this.con = con;
-    }    
+    }
+
+    public HiloCLiente getReceptor() {
+        return receptor;
+    }
+
+    public void setReceptor(HiloCLiente receptor) {
+        this.receptor = receptor;
+    }
 }
