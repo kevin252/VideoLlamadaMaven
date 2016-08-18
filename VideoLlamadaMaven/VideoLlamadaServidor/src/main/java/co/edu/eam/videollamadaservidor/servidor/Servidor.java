@@ -25,6 +25,7 @@ public class Servidor implements Runnable {
                     new Thread(h).start();
                 } catch (Exception exc) {
                     exc.printStackTrace();
+                    //maricon
                 }
             }
         } catch (IOException e) {
