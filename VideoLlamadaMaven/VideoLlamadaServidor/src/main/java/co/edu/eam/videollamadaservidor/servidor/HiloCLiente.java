@@ -35,13 +35,13 @@ public class HiloCLiente implements Runnable {
                 }
                 String ips = "";
                 for (int i = 0; i < servidor.getClientes().size(); i++) {
-                    if (!servidor.getClientes().get(i).getIp().equals(this.getIp())) {
+                   // if (!servidor.getClientes().get(i).getIp().equals(this.getIp())) {
                         if (i == servidor.getClientes().size() - 1) {
                             ips += servidor.getClientes().get(i).getIp();
                             break;
                         }
                         ips += servidor.getClientes().get(i).getIp() + ",";
-                    }
+                   // }//
                 }
                 salidaTxt.println(ips);
             }

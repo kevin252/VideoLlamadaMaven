@@ -6,10 +6,13 @@
 package gui;
 
 import com.mycompany.videollamadacliente.Cliente;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -21,7 +24,7 @@ import util.CameraUtil;
  * @author kvin2
  */
 public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
-
+    String ip;
     Cliente cli;
     DefaultTableModel modelo;
 
@@ -29,13 +32,20 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
      * Creates new form Ventana
      */
     public Ventana() {
-        initComponents();
-        
-        modelo = new DefaultTableModel();
-        jTTabla.setModel(modelo);
-        cli = new Cliente();
-        modelo.addColumn("IP");
-        cli.addObserver(this);
+        try {
+            initComponents();
+            
+            modelo = new DefaultTableModel();
+            jTTabla.setModel(modelo);
+            cli = new Cliente(this);
+            modelo.addColumn("IP");
+            cli.addObserver(this);
+            Thread t = new Thread(cli);
+            t.start();
+            new Thread(this).start();
+        } catch (IOException ex) {
+            Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -72,6 +82,11 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jTTabla.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTTablaMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTTabla);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -82,10 +97,10 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
                 .addGap(370, 370, 370)
                 .addComponent(jBActivar)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLVideo, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 138, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 204, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(38, 38, 38))
         );
@@ -96,7 +111,7 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLVideo, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 248, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 175, Short.MAX_VALUE)
                 .addComponent(jBActivar)
                 .addContainerGap())
         );
@@ -106,11 +121,16 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
 
     private void jBActivarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBActivarActionPerformed
         // TODO add your handling code here:
-        Thread t = new Thread(cli);
-        t.start();
-        new Thread(this).start();
+        
         
     }//GEN-LAST:event_jBActivarActionPerformed
+
+    private void jTTablaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTTablaMouseClicked
+        // TODO add your handling code here:
+        ip="";
+        int seleccion=jTTabla.getSelectedRow();
+        ip="CON:"+String.valueOf(jTTabla.getValueAt(seleccion, 0));
+    }//GEN-LAST:event_jTTablaMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -147,18 +167,27 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
     
     @Override
     public void update(Observable o, Object arg) {
+        LimpiarJTable();
         for (int i = 0; i < cli.getIps().size(); i++) {
             modelo.addRow(new Object[]{cli.getIps().get(i)});
-                        JOptionPane.showMessageDialog(null, "notifico");
 
         }
     }
     
     
-    public void limpiarModelo(){
-        for (int i = 0;i< modelo.getRowCount()-1; i++) {
-            modelo.removeRow(i);
-        }
+    void LimpiarJTable(){
+int a =modelo.getRowCount()-1;
+System.out.println(""+a);
+for(int i=a; i>=0;i--){
+System.out.println("i"+i);
+modelo.removeRow(i);
+}
+}
+    
+    public void setJLVideo(byte[] data){
+       jLVideo.setIcon(new ImageIcon(data));
+                jLVideo.setText(""); 
     }
-            
+    
+   
 }
