@@ -44,7 +44,7 @@ private CameraUtil camara;
                     DatagramSocket udpsoc = new DatagramSocket()) {
                 //crear el paquete
                
-                DatagramPacket pkt = new DatagramPacket(data, data.length, con.getInetAddress(), 45000);
+                DatagramPacket pkt = new DatagramPacket("hola".getBytes(),"hola".getBytes().length,InetAddress.getByName("196.168.1.12"), 45000);
                 
                 udpsoc.send(pkt);
             }

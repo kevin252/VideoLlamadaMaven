@@ -28,25 +28,15 @@ import java.util.logging.Logger;
  * @author kvin2
  */
 public class Cliente extends Observable implements Runnable {
-private Ventana v;
+
+    private Ventana v;
     Socket soc;
     private List<String> ips;
 
-    private List<String> t;
-
-    public List<String> getT() {
-        return t;
-    }
-
-    public void setT(List<String> t) {
-        this.t = t;
-    }
-
     public Cliente(Ventana v) throws IOException {
         ips = new ArrayList<>();
-        t = new ArrayList<>();
-       soc= new Socket("localhost", 45000);
-       this.v=v;
+        soc = new Socket("localhost", 45000);
+        this.v = v;
     }
 
     public List<String> getIps() {
@@ -80,40 +70,67 @@ private Ventana v;
                     ips.clear();
 
                     System.out.println(aux);
-                    String[] ipes = aux.split(",");
-                    System.out.println(ipes[0]);
-                    for (int i = 0; i < ipes.length; i++) {
-                        ips.add(ipes[i]);
 
-                    }
-                    notificar();
-                    user.println("");
-                    try {
+                    String[] ipes = aux.split(",");
+                    if (ipes[0].equals("CON")) {
+                        v.getColgar().setVisible(true);
+                        v.getContestar().setVisible(true);
                         Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+
+                    } else if (ipes[0].equals("OK")) {
+                        HiloFrame hf = new HiloFrame(soc);
+                        new Thread(hf).start();
+
+                        HiloReceptor hr = new HiloReceptor(v);
+                        new Thread(hr).start();
+                    } else if (ipes[0].equals("NO")) {
+                        v.notificacion("No contesto");
+
+                    } else {
+
+                        System.out.println(ipes[0]);
+                        for (int i = 0; i < ipes.length; i++) {
+                            ips.add(ipes[i]);
+
+                        }
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        notificar();
+                        user.println("");
                     }
+
                 }
 
             }
         } catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void conectar(String mensaje) throws IOException {
-        PrintStream salidaIp = new PrintStream(soc.getOutputStream());
-        salidaIp.println(mensaje);
-        
-        BufferedReader conexion = new BufferedReader(new InputStreamReader(soc.getInputStream()));
-        String con=conexion.readLine();
-        if(con.equals("OK")){
-            HiloFrame hf= new HiloFrame(soc);
-            new Thread(hf).start();
-            
-            HiloReceptor hr= new HiloReceptor(v);
-            new Thread(hr).start();
-        }
+    public void llamar(String mensaje) throws IOException {
+        PrintStream llamar = new PrintStream(soc.getOutputStream());
+        llamar.println(mensaje);
+
     }
 
+    public void contestar() throws IOException {
+        PrintStream llamar = new PrintStream(soc.getOutputStream());
+        llamar.println("OK");
+
+        HiloFrame hf = new HiloFrame(soc);
+        new Thread(hf).start();
+
+        HiloReceptor hr = new HiloReceptor(v);
+        new Thread(hr).start();
+    }
+
+    public void rechazarLlamada() throws IOException {
+        PrintStream rechazar = new PrintStream(soc.getOutputStream());
+        rechazar.println("NO");
+    }
 }

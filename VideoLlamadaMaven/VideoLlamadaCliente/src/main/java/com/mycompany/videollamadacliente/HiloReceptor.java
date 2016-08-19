@@ -29,14 +29,14 @@ private Ventana ventana;
     @Override
     public void run() {
         try (DatagramSocket socketIn = new DatagramSocket(45000)) {
-                        byte[] buffer = new byte[10000];
+                        byte[] buffer = new byte[1000];
                         //paquete dondre recibiremos 
                         DatagramPacket pktIn = new DatagramPacket(buffer, buffer.length);
                         //recibimos paquete
                        socketIn.receive(pktIn);
                        byte[] bites = pktIn.getData();
 
-                        ventana.setJLVideo(bites);
+                        ventana.setJLVideo("hola".getBytes());
                
                         
     } catch (SocketException ex) {
