@@ -10,24 +10,9 @@
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
-            <groupId>bridj.id</groupId>
-            <artifactId>bridj</artifactId>
-            <version>0.6.2</version>
-        </dependency>
-        <dependency>
-            <groupId>slf4j.id</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.2</version>
-        </dependency>
-        <dependency>
-            <groupId>webcam.0.3.10.id</groupId>
+            <groupId>com.github.sarxos</groupId>
             <artifactId>webcam-capture</artifactId>
-            <version>0.3.10</version>
-        </dependency>
-        <dependency>
-            <groupId>webcam.0.3.11.id</groupId>
-            <artifactId>webcam-capture</artifactId>
-            <version>0.3.11</version>
+            <version>0.3.11</version>            
         </dependency>
     </dependencies>
     <properties>
