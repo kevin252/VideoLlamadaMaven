@@ -18,6 +18,8 @@ public class HiloCLiente implements Runnable {
     private String ip;
     private Servidor servidor;
     private HiloCLiente receptor;
+    private PrintStream salidaTxt;
+    private BufferedReader entradaTxt;
 
     public HiloCLiente(Socket con, Servidor servidor) {
         super();
@@ -32,8 +34,8 @@ public class HiloCLiente implements Runnable {
             //conexion sea larga...
             //abrir flujos....
             System.out.println("CONECTO");
-            PrintStream salidaTxt = new PrintStream(this.con.getOutputStream());
-            BufferedReader entradaTxt = new BufferedReader(new InputStreamReader(this.con.getInputStream()));
+            salidaTxt = new PrintStream(this.con.getOutputStream());
+            entradaTxt = new BufferedReader(new InputStreamReader(this.con.getInputStream()));
             while (true) {
                 //obtenemos peticion del cliente
                 String peticion = entradaTxt.readLine();
@@ -51,8 +53,9 @@ public class HiloCLiente implements Runnable {
 
     /**
      * Método para que 2 clientes compartan video
+     *
      * @throws SocketException
-     * @throws IOException 
+     * @throws IOException
      */
     private void validarVideo() throws SocketException, IOException {
         if (receptor != null) {
@@ -68,7 +71,7 @@ public class HiloCLiente implements Runnable {
                 //abrimos socket para enviar packete al cliente recpetor
                 try (DatagramSocket socketOut = new DatagramSocket()) {
                     //creamos paquete a enviar al receptor
-                    DatagramPacket pktOut = new DatagramPacket(bites, bites.length, 
+                    DatagramPacket pktOut = new DatagramPacket(bites, bites.length,
                             InetAddress.getByName(receptor.getIp()), 45000);
                     //enviamos paquete
                     socketOut.send(pktOut);
@@ -92,27 +95,22 @@ public class HiloCLiente implements Runnable {
             //la conexion de pantallas
             if (p[0].equals("CON")) {
                 //buscamos el cliente receptor
-                HiloCLiente receptor = buscarHiloCLiente(p[1]);
-                //abrimos los flujos para la solicitud
-                PrintStream salida = new PrintStream(receptor.getCon().getOutputStream());
-                BufferedReader entrada = new BufferedReader(
-                        new InputStreamReader(receptor.getCon().getInputStream()));
+                HiloCLiente aux = buscarHiloCLiente(p[1]);
                 //le solicitamos la conexión
-                salida.println("CON");
-                //obtenemos respuesta del receptor
-                String resp = entrada.readLine();
-                //verificamos que la respuesta sea ok
-                if (!resp.isEmpty() && !resp.equals("") && resp.equals("OK")) {
-                    salidaTxt.println(resp);
-                    this.receptor = receptor;
-                    receptor.setReceptor(this);
-                } else {
-                    salidaTxt.println("NO");
-                }
+                aux.notificar("CON," + ip);
+                //verificamos que la respuesta sea ok                
+            } else if (p[0].equals("OK")) {//si es ok, contesto una llamada 
+                //añadimos los receptores a cada cliente
+                this.receptor = buscarHiloCLiente(p[1]); 
+                this.receptor.setReceptor(this);
+            } else if(p[0].equals("NO")){
+                //Si responde no, notificamos que el clientre rechazo la llamada
+                HiloCLiente aux = buscarHiloCLiente(p[1]);
+                aux.notificar(p[0]);
             } else {
                 //si no, es porque el cliente se acaba de conectar entonces
                 //agregamos su ip al hilocliente para identificar el hilo
-                setIp(peticion);
+                this.ip = peticion;
             }
         }
     }
@@ -130,7 +128,8 @@ public class HiloCLiente implements Runnable {
             //verificamos que no sea la ip del cliente de este hilo
             if (!servidor.getClientes().get(i).getIp().equals(this.getIp())) {
                 //si es el último cliente no le agregamos "," a la cadena
-                if (i == servidor.getClientes().size() - 1) {
+                if (i == servidor.getClientes().size() - 1
+                        || servidor.getClientes().get(i + 1).getIp().equals(this.ip)) {
                     ips += servidor.getClientes().get(i).getIp();
                     break;
                 }
@@ -158,6 +157,10 @@ public class HiloCLiente implements Runnable {
         return null;
     }
 
+    public void notificar(String msj) {
+        salidaTxt.println(msj);
+    }
+
     public String getIp() {
         return ip;
     }
@@ -180,5 +183,13 @@ public class HiloCLiente implements Runnable {
 
     public void setReceptor(HiloCLiente receptor) {
         this.receptor = receptor;
+    }
+
+    public PrintStream getSalidaTxt() {
+        return salidaTxt;
+    }
+
+    public BufferedReader getEntradaTxt() {
+        return entradaTxt;
     }
 }
