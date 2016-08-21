@@ -30,12 +30,13 @@ import java.util.logging.Logger;
 public class Cliente extends Observable implements Runnable {
 
     private Ventana v;
+    private HiloReceptor hilo;
     Socket soc;
     private List<String> ips;
 
     public Cliente(Ventana v) throws IOException {
         ips = new ArrayList<>();
-        soc = new Socket("localhost", 45000);
+        soc = new Socket("192.168.1.66", 45000);
         this.v = v;
     }
 
@@ -73,20 +74,25 @@ public class Cliente extends Observable implements Runnable {
 
                     String[] ipes = aux.split(",");
                     if (ipes[0].equals("CON")) {
+                        v.setIP(ipes[1]);
                         v.getColgar().setVisible(true);
                         v.getContestar().setVisible(true);
                         Thread.sleep(1000);
+                        
 
                     } else if (ipes[0].equals("OK")) {
                         HiloFrame hf = new HiloFrame(soc);
                         new Thread(hf).start();
-
-                        HiloReceptor hr = new HiloReceptor(v);
+                        
+                        HiloReceptor hr = new HiloReceptor(v,soc);
+                        hilo=hr;
                         new Thread(hr).start();
                     } else if (ipes[0].equals("NO")) {
                         v.notificacion("No contesto");
 
-                    } else {
+                    }else if(ipes[0].equals("TAM")){
+                        hilo.setTama(Integer.parseInt(ipes[1]));
+                    }else {
 
                         System.out.println(ipes[0]);
                         for (int i = 0; i < ipes.length; i++) {
@@ -118,14 +124,14 @@ public class Cliente extends Observable implements Runnable {
 
     }
 
-    public void contestar() throws IOException {
+    public void contestar(String ip) throws IOException {
         PrintStream llamar = new PrintStream(soc.getOutputStream());
-        llamar.println("OK");
+        llamar.println("OK:"+ip);
 
         HiloFrame hf = new HiloFrame(soc);
         new Thread(hf).start();
 
-        HiloReceptor hr = new HiloReceptor(v);
+        HiloReceptor hr = new HiloReceptor(v,soc);
         new Thread(hr).start();
     }
 

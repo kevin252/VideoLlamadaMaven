@@ -68,7 +68,7 @@ public class CameraUtil {
 		ImageWriter writer = iter.next();
 		ImageWriteParam iwp = writer.getDefaultWriteParam();
 		iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-		iwp.setCompressionQuality(0.3f);
+		iwp.setCompressionQuality(0.1f);
 		writer.setOutput(ios);
 		writer.write(null, new IIOImage(image, null, null), iwp);
 		writer.dispose();

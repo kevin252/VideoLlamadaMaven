@@ -28,6 +28,7 @@ import util.CameraUtil;
 public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
 
     String ip;
+    String IP;
     Cliente cli;
     DefaultTableModel modelo;
 
@@ -164,7 +165,7 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
         
         try {
             // TODO add your handling code here:
-            cli.contestar();
+            cli.contestar(IP);
         } catch (IOException ex) {
             Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -272,5 +273,9 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
 
     public void notificacion(String mensaje){
         JOptionPane.showMessageDialog(null, mensaje);
+    }
+    
+    public void setIP(String ip){
+        IP=ip;
     }
 }
