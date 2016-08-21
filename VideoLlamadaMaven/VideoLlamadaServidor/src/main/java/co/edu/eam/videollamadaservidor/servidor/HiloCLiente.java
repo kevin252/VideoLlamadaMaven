@@ -9,6 +9,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,12 +21,14 @@ public class HiloCLiente implements Runnable {
     private HiloCLiente receptor;
     private PrintStream salidaTxt;
     private BufferedReader entradaTxt;
+    private int tamanoImg;
 
     public HiloCLiente(Socket con, Servidor servidor) {
         super();
         this.con = con;
         this.servidor = servidor;
         this.receptor = null;
+        this.tamanoImg = 0;
     }
 
     @Override
@@ -58,24 +61,25 @@ public class HiloCLiente implements Runnable {
      * @throws IOException
      */
     private void validarVideo() throws SocketException, IOException {
-        if (receptor != null) {
+        if (receptor != null && tamanoImg != 0) {
             //abrimos servidor
-            try (DatagramSocket socketIn = new DatagramSocket(45000)) {
-                byte[] buffer = new byte[10000];
-                //paquete dondre recibiremos 
-                DatagramPacket pktIn = new DatagramPacket(buffer, buffer.length);
-                //recibimos paquete
-                socketIn.receive(pktIn);
-                //lo convertimos en bytes para reenviarlo
-                byte[] bites = pktIn.getData();
-                //abrimos socket para enviar packete al cliente recpetor
-                try (DatagramSocket socketOut = new DatagramSocket()) {
+            try (DatagramSocket socket = new DatagramSocket(con.getLocalSocketAddress())) {
+                byte[] buffer = new byte[1024];
+                int cont = 1;
+                while (1024 * cont <= tamanoImg) {
+                    DatagramPacket pktIn = new DatagramPacket(buffer, buffer.length);
+                    socket.receive(pktIn);
+                    byte[] cortes = pktIn.getData();
+                    System.out.println(cortes.toString()+" "+cortes.length);
+                    //abrimos socket para enviar packete al cliente recpetor
                     //creamos paquete a enviar al receptor
-                    DatagramPacket pktOut = new DatagramPacket(bites, bites.length,
-                            InetAddress.getByName(receptor.getIp()), 45000);
+                    DatagramPacket pktOut = new DatagramPacket(cortes, cortes.length,
+                            receptor.getCon().getLocalSocketAddress());
                     //enviamos paquete
-                    socketOut.send(pktOut);
+                    socket.send(pktOut);
+                    cont++;
                 }
+                this.tamanoImg = 0;
             }
         }
     }
@@ -101,16 +105,19 @@ public class HiloCLiente implements Runnable {
                 //verificamos que la respuesta sea ok                
             } else if (p[0].equals("OK")) {//si es ok, contesto una llamada 
                 //añadimos los receptores a cada cliente
-                this.receptor = buscarHiloCLiente(p[1]); 
-                this.receptor.setReceptor(this);
-            } else if(p[0].equals("NO")){
+                receptor = buscarHiloCLiente(p[1]);
+                receptor.setReceptor(this);
+            } else if (p[0].equals("NO")) {
                 //Si responde no, notificamos que el clientre rechazo la llamada
                 HiloCLiente aux = buscarHiloCLiente(p[1]);
                 aux.notificar(p[0]);
+            } else if (p[0].endsWith("TAM")){      
+                tamanoImg = Integer.parseInt(p[1]);
+                receptor.notificar("TAM," + ip);
             } else {
                 //si no, es porque el cliente se acaba de conectar entonces
                 //agregamos su ip al hilocliente para identificar el hilo
-                this.ip = peticion;
+                ip = peticion;
             }
         }
     }

@@ -39,7 +39,5 @@ public class Servidor implements Runnable {
 
     public void setClientes(List<HiloCLiente> clientes) {
         this.clientes = clientes;
-    }
-
-    
+    }    
 }
