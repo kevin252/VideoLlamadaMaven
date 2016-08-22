@@ -175,9 +175,12 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
 
     private void jTTablaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTTablaMouseClicked
         // TODO add your handling code here:
-        ip = "";
+        if(evt.getClickCount()==1){
+           ip = "";
         int seleccion = jTTabla.getSelectedRow();
-        ip = "CON:" + String.valueOf(jTTabla.getValueAt(seleccion, 0));
+        ip = "CON:" + String.valueOf(jTTabla.getValueAt(seleccion, 0));  
+        }
+       
     }//GEN-LAST:event_jTTablaMouseClicked
 
     private void jBColgarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBColgarActionPerformed
@@ -277,5 +280,9 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
     
     public void setIP(String ip){
         IP=ip;
+    }
+    
+    public String getIP(){
+        return ip;
     }
 }

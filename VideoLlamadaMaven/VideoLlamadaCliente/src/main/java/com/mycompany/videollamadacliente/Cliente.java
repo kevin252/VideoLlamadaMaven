@@ -38,6 +38,7 @@ public class Cliente extends Observable implements Runnable {
         ips = new ArrayList<>();
         soc = new Socket("192.168.1.66", 45000);
         this.v = v;
+        hilo= new HiloReceptor(v, soc);
     }
 
     public List<String> getIps() {
@@ -81,12 +82,9 @@ public class Cliente extends Observable implements Runnable {
                         
 
                     } else if (ipes[0].equals("OK")) {
-                        HiloFrame hf = new HiloFrame(soc);
+                        HiloFrame hf = new HiloFrame(soc,v.getIP());
                         new Thread(hf).start();
-                        
-                        HiloReceptor hr = new HiloReceptor(v,soc);
-                        hilo=hr;
-                        new Thread(hr).start();
+                        new Thread(hilo).start();
                     } else if (ipes[0].equals("NO")) {
                         v.notificacion("No contesto");
 
@@ -128,11 +126,9 @@ public class Cliente extends Observable implements Runnable {
         PrintStream llamar = new PrintStream(soc.getOutputStream());
         llamar.println("OK:"+ip);
 
-        HiloFrame hf = new HiloFrame(soc);
+        HiloFrame hf = new HiloFrame(soc,ip);
         new Thread(hf).start();
-
-        HiloReceptor hr = new HiloReceptor(v,soc);
-        new Thread(hr).start();
+        new Thread(hilo).start();
     }
 
     public void rechazarLlamada() throws IOException {

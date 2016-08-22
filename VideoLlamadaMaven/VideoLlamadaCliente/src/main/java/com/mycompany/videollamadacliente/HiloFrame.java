@@ -27,10 +27,12 @@ public class HiloFrame implements Runnable {
 
     private Socket con;
     private CameraUtil camara;
+    private String ip;
 
-    public HiloFrame(Socket con) {
+    public HiloFrame(Socket con, String ip) {
         this.con = con;
         camara = new CameraUtil();
+        this.ip = ip;
     }
 
     @Override
@@ -44,17 +46,22 @@ public class HiloFrame implements Runnable {
                 try {
 //crear el paquete
                     try ( // TODO code application logic here
+                            //crear el DatagramSocket
                             DatagramSocket udpsoc = new DatagramSocket()) {
-                        //crear el paquete
+                        
                         int cont = 1;
-                        PrintStream buffData= new PrintStream(con.getOutputStream());
-                        buffData.println("TAM:"+data.length);
+                        
+                        //abrir flujo de salida
+                        PrintStream buffData = new PrintStream(con.getOutputStream());
+                        //enviar el tamaño
+                        buffData.println("TAM:" + data.length);
+                        //segmentar el arreglo de bytes
                         while (1024 * cont <= data.length) {
                             byte[] corte = Arrays.copyOfRange(data, (cont - 1)
                                     * 1024, cont * 1024);
-
-                            DatagramPacket pkt = new DatagramPacket(corte, 1024, con.getRemoteSocketAddress());
-
+                            //creamos el DatagramPacket
+                            DatagramPacket pkt = new DatagramPacket(corte, 1024, InetAddress.getByName(ip), 47000);
+                            //enviaamos los bytes
                             udpsoc.send(pkt);
                             cont++;
                         }
@@ -64,7 +71,6 @@ public class HiloFrame implements Runnable {
                 } catch (IOException ex) {
                     Logger.getLogger(HiloFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
                 Thread.sleep(1000);
             } catch (Exception e) {
                 // TODO Auto-generated catch block

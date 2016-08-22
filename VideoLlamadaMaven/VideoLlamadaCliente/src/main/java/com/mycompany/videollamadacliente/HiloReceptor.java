@@ -8,6 +8,7 @@ package com.mycompany.videollamadacliente;
 import com.google.common.primitives.Bytes;
 import gui.Ventana;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;
@@ -28,43 +29,43 @@ public class HiloReceptor implements Runnable {
     private Socket con;
     private Ventana ventana;
     private int tama;
-           
 
     public HiloReceptor(Ventana v, Socket con) {
         this.ventana = v;
         this.con = con;
-        this.tama=0;
+        this.tama = 0;
     }
 
     public void setTama(int tama) {
         this.tama = tama;
     }
-    
-    
 
     @Override
     public void run() {
-        try (DatagramSocket socketIn = new DatagramSocket(con.getLocalSocketAddress())) {
+        try (DatagramSocket socketIn = new DatagramSocket(46000)) {
             while (true) {
-                
-                if(tama>0){
-                byte[] buffer = new byte[1024];
-                //paquete dondre recibiremos 
-                
-                    
+
+                if (tama > 0) {
+                    byte[] buffer = new byte[1024];
+                    //paquete dondre recibiremos 
+
                     int cont = 1;
                     byte[] img = new byte[tama];
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
                     while (1024 * cont <= tama) {
                         DatagramPacket pktIn = new DatagramPacket(buffer, buffer.length);
-                        img = Bytes.concat(img, pktIn.getData());
+                        
                         socketIn.receive(pktIn);
+                        outputStream.write(pktIn.getData());
                         System.out.println(pktIn.getData().toString() + " " + pktIn.getData().length);
                         cont++;
                     }
+                    img=outputStream.toByteArray();
                     ventana.setJLVideo(img);
-                    tama=0;
+                    tama = 0;
                 }
-            
+
             }
         } catch (SocketException ex) {
             Logger.getLogger(HiloReceptor.class.getName()).log(Level.SEVERE, null, ex);
