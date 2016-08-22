@@ -46,44 +46,43 @@ public class HiloCLiente implements Runnable {
                 validarPeticion(peticion, salidaTxt);
                 //enviamos los clientes que estan conectados
                 enviarClientes(salidaTxt);
-                //validamos si hay que compartir video
-                validarVideo();
+//                //validamos si hay que compartir video
+//                validarVideo();
             }
         } catch (IOException ex) {
             Logger.getLogger(HiloCLiente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    /**
-     * Método para que 2 clientes compartan video
-     *
-     * @throws SocketException
-     * @throws IOException
-     */
-    private void validarVideo() throws SocketException, IOException {
-        if (receptor != null && tamanoImg != 0) {
-            //abrimos servidor
-            try (DatagramSocket socket = new DatagramSocket(con.getLocalSocketAddress())) {
-                byte[] buffer = new byte[1024];
-                int cont = 1;
-                while (1024 * cont <= tamanoImg) {
-                    DatagramPacket pktIn = new DatagramPacket(buffer, buffer.length);
-                    socket.receive(pktIn);
-                    byte[] cortes = pktIn.getData();
-                    System.out.println(cortes.toString()+" "+cortes.length);
-                    //abrimos socket para enviar packete al cliente recpetor
-                    //creamos paquete a enviar al receptor
-                    DatagramPacket pktOut = new DatagramPacket(cortes, cortes.length,
-                            receptor.getCon().getLocalSocketAddress());
-                    //enviamos paquete
-                    socket.send(pktOut);
-                    cont++;
-                }
-                this.tamanoImg = 0;
-            }
-        }
-    }
-
+//    /**
+//     * Método para que 2 clientes compartan video
+//     *
+//     * @throws SocketException
+//     * @throws IOException
+//     */
+//    private void validarVideo() throws SocketException, IOException {
+//        if (receptor != null && tamanoImg != 0) {
+//            //abrimos servidor
+//            try (DatagramSocket socket = new DatagramSocket(con.getLocalSocketAddress())) {
+//                byte[] buffer = new byte[1024];
+//                int cont = 1;
+//                while (1024 * cont <= tamanoImg) {
+//                    DatagramPacket pktIn = new DatagramPacket(buffer, buffer.length);
+//                    socket.receive(pktIn);
+//                    byte[] cortes = pktIn.getData();
+//                    System.out.println(ip + " " + cortes.toString() + " " + cortes.length);
+//                    //abrimos socket para enviar packete al cliente recpetor
+//                    //creamos paquete a enviar al receptor
+//                    DatagramPacket pktOut = new DatagramPacket(cortes, cortes.length,
+//                            InetAddress.getByName(receptor.getIp()), 47000);
+//                    //enviamos paquete
+//                    socket.send(pktOut);
+//                    cont++;
+//                }
+//                this.tamanoImg = 0;
+//            }
+//        }
+//    }
     /**
      * Método para validar la petición que el cliente le hace al servidor
      *
@@ -107,13 +106,14 @@ public class HiloCLiente implements Runnable {
                 //añadimos los receptores a cada cliente
                 receptor = buscarHiloCLiente(p[1]);
                 receptor.setReceptor(this);
+                receptor.notificar("OK");
             } else if (p[0].equals("NO")) {
                 //Si responde no, notificamos que el clientre rechazo la llamada
                 HiloCLiente aux = buscarHiloCLiente(p[1]);
                 aux.notificar(p[0]);
-            } else if (p[0].endsWith("TAM")){      
+            } else if (p[0].endsWith("TAM")) {
                 tamanoImg = Integer.parseInt(p[1]);
-                receptor.notificar("TAM," + ip);
+                receptor.notificar("TAM," + tamanoImg);
             } else {
                 //si no, es porque el cliente se acaba de conectar entonces
                 //agregamos su ip al hilocliente para identificar el hilo
