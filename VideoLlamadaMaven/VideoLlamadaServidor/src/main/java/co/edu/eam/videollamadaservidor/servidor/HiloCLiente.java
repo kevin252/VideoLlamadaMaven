@@ -4,12 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
-import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -106,12 +101,12 @@ public class HiloCLiente implements Runnable {
                 //añadimos los receptores a cada cliente
                 receptor = buscarHiloCLiente(p[1]);
                 receptor.setReceptor(this);
-                receptor.notificar("OK");
+                receptor.notificar("OK");            
             } else if (p[0].equals("NO")) {
                 //Si responde no, notificamos que el clientre rechazo la llamada
                 HiloCLiente aux = buscarHiloCLiente(p[1]);
                 aux.notificar(p[0]);
-            } else if (p[0].endsWith("TAM")) {
+            } else if (p[0].equals("TAM")) {
                 tamanoImg = Integer.parseInt(p[1]);
                 receptor.notificar("TAM," + tamanoImg);
             } else {
@@ -133,15 +128,15 @@ public class HiloCLiente implements Runnable {
         //recorremos los clientes conectados
         for (int i = 0; i < servidor.getClientes().size(); i++) {
             //verificamos que no sea la ip del cliente de este hilo
-            if (!servidor.getClientes().get(i).getIp().equals(this.getIp())) {
+//            if (!servidor.getClientes().get(i).getIp().equals(this.ip)) {
                 //si es el último cliente no le agregamos "," a la cadena
-                if (i == servidor.getClientes().size() - 1
-                        || servidor.getClientes().get(i + 1).getIp().equals(this.ip)) {
+                if (i == servidor.getClientes().size() - 1){
+//                        || servidor.getClientes().get(i + 1).getIp().equals(this.ip)) {
                     ips += servidor.getClientes().get(i).getIp();
                     break;
                 }
                 ips += servidor.getClientes().get(i).getIp() + ",";
-            }
+//            }
         }
         //enviamos los clientes
         salidaTxt.println(ips);
