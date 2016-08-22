@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.videollamadacliente;
+package co.edu.eam.videollamadacliente.cliente;
 
-import gui.Ventana;
+import co.edu.eam.videollamadacliente.gui.Ventana;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,9 +38,9 @@ public class Cliente extends Observable implements Runnable {
 
     public Cliente(Ventana v) throws IOException {
         ips = new ArrayList<>();
-        soc = new Socket("192.168.1.66", 45000);
+        soc = new Socket(cargarProperties(), 45000);
         this.v = v;
-        hilo= new HiloReceptor(v, soc);
+        hilo = new HiloReceptor(v, soc);
     }
 
     public List<String> getIps() {
@@ -64,6 +66,7 @@ public class Cliente extends Observable implements Runnable {
             PrintStream user = new PrintStream(soc.getOutputStream());
             user.println(address.getHostAddress());
             BufferedReader listaIps = new BufferedReader(new InputStreamReader(soc.getInputStream()));
+            byte[] auxi = new byte[1024];
 
             while (true) {
 
@@ -78,32 +81,34 @@ public class Cliente extends Observable implements Runnable {
                         v.setIP(ipes[1]);
                         v.getColgar().setVisible(true);
                         v.getContestar().setVisible(true);
-                        Thread.sleep(1000);
-                        
 
                     } else if (ipes[0].equals("OK")) {
-                        HiloFrame hf = new HiloFrame(soc,v.getIP());
+                        HiloFrame hf = new HiloFrame(soc, v.getIP());
                         new Thread(hf).start();
                         new Thread(hilo).start();
                     } else if (ipes[0].equals("NO")) {
                         v.notificacion("No contesto");
 
-                    }else if(ipes[0].equals("TAM")){
-                        hilo.setTama(Integer.parseInt(ipes[1]));
-                    }else {
+                    } else if (ipes[0].equals("TAM")) {
 
+                        hilo.setTama(Integer.parseInt(ipes[1]));
+
+                    } else {
                         System.out.println(ipes[0]);
                         for (int i = 0; i < ipes.length; i++) {
-                            ips.add(ipes[i]);
+                            if (ipes[i].equals(address.getHostAddress())) {
+
+                            } else {
+                                ips.add(ipes[i]);
+                            }
+
+                            Thread.sleep(1000);
 
                         }
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+
                         notificar();
                         user.println("");
+
                     }
 
                 }
@@ -123,10 +128,11 @@ public class Cliente extends Observable implements Runnable {
     }
 
     public void contestar(String ip) throws IOException {
-        PrintStream llamar = new PrintStream(soc.getOutputStream());
-        llamar.println("OK:"+ip);
-
-        HiloFrame hf = new HiloFrame(soc,ip);
+        PrintStream salida = new PrintStream(soc.getOutputStream());
+        salida.println("OK:" + ip);
+        HiloFrame hf = new HiloFrame(soc, ip);
+        v.getColgar().setVisible(false);
+        v.getContestar().setVisible(false);
         new Thread(hf).start();
         new Thread(hilo).start();
     }
@@ -134,5 +140,19 @@ public class Cliente extends Observable implements Runnable {
     public void rechazarLlamada() throws IOException {
         PrintStream rechazar = new PrintStream(soc.getOutputStream());
         rechazar.println("NO");
+        v.getColgar().setVisible(false);
+        v.getContestar().setVisible(false);
+    }
+
+    public String cargarProperties() {
+        try {
+            Properties pro = new Properties();
+            pro.load(new FileInputStream("C:\\Users\\kvin2\\Documents\\GitHub\\VideoLlamadaMaven\\VideoLlamadaMaven\\VideoLlamadaCliente\\src\\main\\java\\co\\edu\\eam\\videollamadacliente\\properties\\propiedades.properties"));
+            String servidor = pro.getProperty("servidor");
+            return servidor;
+        } catch (IOException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 }

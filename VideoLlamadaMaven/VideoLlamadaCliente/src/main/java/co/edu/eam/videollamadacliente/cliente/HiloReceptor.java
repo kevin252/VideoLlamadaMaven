@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.videollamadacliente;
+package co.edu.eam.videollamadacliente.cliente;
 
 import com.google.common.primitives.Bytes;
-import gui.Ventana;
+import co.edu.eam.videollamadacliente.gui.Ventana;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class HiloReceptor implements Runnable {
 
     @Override
     public void run() {
-        try (DatagramSocket socketIn = new DatagramSocket(46000)) {
+        try (DatagramSocket socketIn = new DatagramSocket(47000)) {
             while (true) {
 
                 if (tama > 0) {

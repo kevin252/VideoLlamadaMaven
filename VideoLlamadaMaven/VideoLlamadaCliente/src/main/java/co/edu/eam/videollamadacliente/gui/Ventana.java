@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gui;
+package co.edu.eam.videollamadacliente.gui;
 
-import com.mycompany.videollamadacliente.Cliente;
+import co.edu.eam.videollamadacliente.cliente.Cliente;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import util.CameraUtil;
+import co.edu.eam.videollamadacliente.util.CameraUtil;
 
 /**
  *
@@ -283,6 +283,6 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
     }
     
     public String getIP(){
-        return ip;
+        return IP;
     }
 }

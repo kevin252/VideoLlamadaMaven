@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package main;
+package co.edu.eam.videollamadacliente.main;
 
-import gui.Ventana;
+import co.edu.eam.videollamadacliente.gui.Ventana;
 
 /**
  *

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.videollamadacliente;
+package co.edu.eam.videollamadacliente.cliente;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import util.CameraUtil;
+import co.edu.eam.videollamadacliente.util.CameraUtil;
 
 /**
  *
@@ -55,23 +55,26 @@ public class HiloFrame implements Runnable {
                         PrintStream buffData = new PrintStream(con.getOutputStream());
                         //enviar el tamaño
                         buffData.println("TAM:" + data.length);
+                        byte[] jh=new byte[1024];
                         //segmentar el arreglo de bytes
                         while (1024 * cont <= data.length) {
                             byte[] corte = Arrays.copyOfRange(data, (cont - 1)
                                     * 1024, cont * 1024);
                             //creamos el DatagramPacket
-                            DatagramPacket pkt = new DatagramPacket(corte, 1024, InetAddress.getByName(ip), 47000);
+                         DatagramPacket    pkt = new DatagramPacket(corte, 1024, InetAddress.getByName(ip), 46000);
                             //enviaamos los bytes
                             udpsoc.send(pkt);
                             cont++;
                         }
+//                     DatagramPacket   pekt= new DatagramPacket(jh, jh.length);
+//                        udpsoc.receive(pekt);
                     }
                 } catch (SocketException ex) {
                     Logger.getLogger(HiloFrame.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
                     Logger.getLogger(HiloFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                Thread.sleep(1000);
+               
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
