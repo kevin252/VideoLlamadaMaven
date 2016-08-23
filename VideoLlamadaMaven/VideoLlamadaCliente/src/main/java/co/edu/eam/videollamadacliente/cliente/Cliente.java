@@ -86,15 +86,14 @@ public class Cliente extends Observable implements Runnable {
                         new Thread(hr).start();
                         v.getColgar().setVisible(true);
                     } else if (ipes[0].equals("NO")) {
-                        if(hf != null){
+                        if (hf != null) {
                             hf.setEstado(false);
                             hr.setEstado(false);
-                            v.setJLVideo(new byte[0]);
-                            v.repaint();
+                            limpiarLabel();
                             v.notificacion("Termino el Streaming");
-                        }else{
+                        } else {
                             v.notificacion("No contesto");
-                        }                        
+                        }
                     } else {
                         for (int i = 0; i < ipes.length; i++) {
                             if (ipes[i].equals(address.getHostAddress())) {
@@ -131,19 +130,22 @@ public class Cliente extends Observable implements Runnable {
         new Thread(hr).start();
     }
 
-    public synchronized void rechazarLlamada() throws IOException {
+    public void rechazarLlamada() throws IOException, InterruptedException {
         PrintStream rechazar = new PrintStream(soc.getOutputStream());
-        rechazar.println("NO:"+v.getIP());
+        rechazar.println("NO:" + v.getIP());
         if (hf != null) {
             hr.setEstado(false);
             hf.setEstado(false);
-            v.setJLVideo(new byte[0]);
-            v.repaint();
         } else {
             v.getColgar().setVisible(false);
             v.getContestar().setVisible(false);
         }
+    }
 
+    public synchronized void limpiarLabel() {
+        v.setJLVideo(new byte[0]);
+        v.repaint();
+        v.repaint();
     }
 
     public String cargarProperties() {

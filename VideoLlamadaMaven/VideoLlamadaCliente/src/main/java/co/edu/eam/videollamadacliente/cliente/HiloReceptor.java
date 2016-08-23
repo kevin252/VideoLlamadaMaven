@@ -44,6 +44,8 @@ public class HiloReceptor implements Runnable {
                 socketIn.receive(pktIn);
                 ventana.setJLVideo(pktIn.getData());
             }
+            ventana.setJLVideo(new byte[0]);
+            ventana.repaint();
         } catch (SocketException ex) {
             Logger.getLogger(HiloReceptor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
