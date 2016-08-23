@@ -76,6 +76,9 @@ public class CameraUtil {
 	}
 
 
+        public void cerrarCamara(){
+            webcam.close();
+        }
 
  
 }

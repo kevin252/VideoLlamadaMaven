@@ -41,11 +41,12 @@ public class HiloFrame implements Runnable {
         camara.initCamera();
         while (estado) {
             byte[] data;
+            
             try {                
                 data = camara.getFrame();                
                 try {
                     try (DatagramSocket udpsoc = new DatagramSocket()) {                      
-                        DatagramPacket pkt = new DatagramPacket(data, data.length, InetAddress.getByName(ip), 46000);                        
+                        DatagramPacket pkt = new DatagramPacket(data, data.length, InetAddress.getByName("25.13.173.95"), 46000);                        
                         udpsoc.send(pkt);//                      
                     }
                 } catch (SocketException ex) {
@@ -59,6 +60,7 @@ public class HiloFrame implements Runnable {
                 e.printStackTrace();
             }
         }
+        camara.cerrarCamara();
     }
 
     public void setEstado(boolean estado) {
