@@ -88,7 +88,8 @@ public class Cliente extends Observable implements Runnable {
                         if(hf != null){
                             hf.setEstado(false);
                             hr.setEstado(false);
-                            v.setJLVideo(null);
+                            v.setJLVideo(new byte[0]);
+                            v.getJLVideo().revalidate();
                             v.notificacion("Termino el Streaming");
                         }else{
                             v.notificacion("No contesto");
@@ -131,11 +132,12 @@ public class Cliente extends Observable implements Runnable {
 
     public void rechazarLlamada() throws IOException {
         PrintStream rechazar = new PrintStream(soc.getOutputStream());
-        rechazar.println("NO");
+        rechazar.println("NO:"+v.getIP());
         if (hf != null) {
             hr.setEstado(false);
             hf.setEstado(false);
-            v.setJLVideo(null);
+            v.setJLVideo(new byte[0]);
+            v.getJLVideo().revalidate();
         } else {
             v.getColgar().setVisible(false);
             v.getContestar().setVisible(false);
