@@ -42,29 +42,30 @@ public class HiloReceptor implements Runnable {
 
     @Override
     public void run() {
-        try (DatagramSocket socketIn = new DatagramSocket(47000)) {
+        try (DatagramSocket socketIn = new DatagramSocket(46000)) {
+            
             while (true) {
-
-                if (tama > 0) {
-                    byte[] buffer = new byte[1024];
+                System.out.println("Estamos en receptor");
+//                if (tama > 0) {
+                    byte[] buffer = new byte[15000];
                     //paquete dondre recibiremos 
 
                     int cont = 1;
                     byte[] img = new byte[tama];
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    //ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-                    while (1024 * cont <= tama) {
+//                    while (1024 * cont <= tama) {
                         DatagramPacket pktIn = new DatagramPacket(buffer, buffer.length);
-                        
-                        socketIn.receive(pktIn);
-                        outputStream.write(pktIn.getData());
-                        System.out.println(pktIn.getData().toString() + " " + pktIn.getData().length);
-                        cont++;
-                    }
-                    img=outputStream.toByteArray();
-                    ventana.setJLVideo(img);
+//                        
+                       socketIn.receive(pktIn);
+//                        outputStream.write(pktIn.getData());
+//                        System.out.println(pktIn.getData().toString() + " " + pktIn.getData().length);
+//                        cont++;
+//                    }
+                   // img=outputStream.toByteArray();
+                    ventana.setJLVideo(pktIn.getData());
                     tama = 0;
-                }
+//                }
 
             }
         } catch (SocketException ex) {
