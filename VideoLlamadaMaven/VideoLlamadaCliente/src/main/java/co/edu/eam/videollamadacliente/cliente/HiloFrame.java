@@ -25,49 +25,26 @@ import co.edu.eam.videollamadacliente.util.CameraUtil;
  */
 public class HiloFrame implements Runnable {
 
-    private Socket con;
     private CameraUtil camara;
     private String ip;
 
     public HiloFrame(Socket con, String ip) {
-        this.con = con;
         camara = new CameraUtil();
         this.ip = ip;
     }
 
     @Override
     public void run() {
+        System.out.println(ip);
         camara.initCamera();
         while (true) {
             byte[] data;
             try {                
-                data = camara.getFrame();
-                
+                data = camara.getFrame();                
                 try {
-//crear el paquete
-                    try ( // TODO code application logic here
-                            //crear el DatagramSocket
-                            DatagramSocket udpsoc = new DatagramSocket()) {
-
-//                        int cont = 1;
-
-                        //abrir flujo de salida
-//                        PrintStream buffData = new PrintStream(con.getOutputStream());
-//                        //enviar el tamaño
-//                        buffData.println("TAM:" + data.length);
-                        byte[] jh = new byte[15000];
-                        //segmentar el arreglo de bytes
-//                        while (1024 * cont <= data.length) {
-//                            byte[] corte = Arrays.copyOfRange(data, (cont - 1)
-//                                    * 1024, cont * 1024);
-                        //creamos el DatagramPacket
-                        DatagramPacket pkt = new DatagramPacket(data, data.length, InetAddress.getByName(ip), 46000);
-                        //enviaamos los bytes
-                        udpsoc.send(pkt);
-//                            cont++;
-//                        }
-//                     DatagramPacket   pekt= new DatagramPacket(jh, jh.length);
-//                        udpsoc.receive(pekt);
+                    try (DatagramSocket udpsoc = new DatagramSocket()) {                      
+                        DatagramPacket pkt = new DatagramPacket(data, data.length, InetAddress.getByName(ip), 46000);                        
+                        udpsoc.send(pkt);//                      
                     }
                 } catch (SocketException ex) {
                     Logger.getLogger(HiloFrame.class.getName()).log(Level.SEVERE, null, ex);

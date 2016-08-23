@@ -32,15 +32,13 @@ import java.util.logging.Logger;
 public class Cliente extends Observable implements Runnable {
 
     private Ventana v;
-    private HiloReceptor hilo;
-    Socket soc;
+    private Socket soc;
     private List<String> ips;
 
     public Cliente(Ventana v) throws IOException {
         ips = new ArrayList<>();
         soc = new Socket(cargarProperties(), 45000);
         this.v = v;
-        hilo = new HiloReceptor(v, soc);
     }
 
     public List<String> getIps() {
@@ -65,34 +63,26 @@ public class Cliente extends Observable implements Runnable {
             InetAddress address = InetAddress.getLocalHost();
             PrintStream user = new PrintStream(soc.getOutputStream());
             user.println(address.getHostAddress());
-            BufferedReader listaIps = new BufferedReader(new InputStreamReader(soc.getInputStream()));
-            byte[] auxi = new byte[1024];
+            BufferedReader listaIps = new BufferedReader(new InputStreamReader(soc.getInputStream()));           
 
             while (true) {
 
                 String aux = listaIps.readLine();
                 if (!aux.equals("")) {
                     ips.clear();
-
                     System.out.println(aux);
-
                     String[] ipes = aux.split(",");
                     if (ipes[0].equals("CON")) {
                         v.setIP(ipes[1]);
                         v.getColgar().setVisible(true);
                         v.getContestar().setVisible(true);
-
                     } else if (ipes[0].equals("OK")) {
                         HiloFrame hf = new HiloFrame(soc, v.getIP());
                         new Thread(hf).start();
-                        new Thread(hilo).start();
+                        HiloReceptor hr = new HiloReceptor(v);
+                        new Thread(hr).start();
                     } else if (ipes[0].equals("NO")) {
                         v.notificacion("No contesto");
-
-                    } else if (ipes[0].equals("TAM")) {
-
-                        hilo.setTama(Integer.parseInt(ipes[1]));
-
                     } else {
                         System.out.println(ipes[0]);
                         for (int i = 0; i < ipes.length; i++) {
@@ -129,12 +119,13 @@ public class Cliente extends Observable implements Runnable {
 
     public void contestar(String ip) throws IOException {
         PrintStream salida = new PrintStream(soc.getOutputStream());
-        salida.println("OK:" + ip);
-        HiloFrame hf = new HiloFrame(soc, ip);
+        salida.println("OK:" + ip);        
         v.getColgar().setVisible(false);
         v.getContestar().setVisible(false);
+        HiloFrame hf = new HiloFrame(soc, ip);
         new Thread(hf).start();
-        new Thread(hilo).start();
+        HiloReceptor hr = new HiloReceptor(v);
+        new Thread(hr).start();
     }
 
     public void rechazarLlamada() throws IOException {
