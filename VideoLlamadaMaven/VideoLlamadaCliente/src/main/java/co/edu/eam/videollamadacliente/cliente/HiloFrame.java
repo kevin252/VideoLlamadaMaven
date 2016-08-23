@@ -46,7 +46,7 @@ public class HiloFrame implements Runnable {
                 data = camara.getFrame();                
                 try {
                     try (DatagramSocket udpsoc = new DatagramSocket()) {                      
-                        DatagramPacket pkt = new DatagramPacket(data, data.length, InetAddress.getByName("25.13.173.95"), 46000);                        
+                        DatagramPacket pkt = new DatagramPacket(data, data.length, InetAddress.getByName("25.13.202.22"), 46000);                        
                         udpsoc.send(pkt);//                      
                     }
                 } catch (SocketException ex) {

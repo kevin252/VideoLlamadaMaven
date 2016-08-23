@@ -38,7 +38,7 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
     public Ventana() {
         try {
             initComponents();
-
+            ip = "";
             modelo = new DefaultTableModel();
             jTTabla.setModel(modelo);
             cli = new Cliente(this);
@@ -148,45 +148,49 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBActivarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBActivarActionPerformed
-        
+
         try {
             // TODO add your handling code here:
             cli.contestar(IP);
         } catch (IOException ex) {
             Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
 
     }//GEN-LAST:event_jBActivarActionPerformed
 
     private void jTTablaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTTablaMouseClicked
         // TODO add your handling code here:
-        if(evt.getClickCount()==1){
-           ip = "";
-        int seleccion = jTTabla.getSelectedRow();
-        ip = "CON:" + String.valueOf(jTTabla.getValueAt(seleccion, 0));  
+        if (evt.getClickCount() == 1) {
+            ip = "";
+            int seleccion = jTTabla.getSelectedRow();
+            ip = "CON:" + String.valueOf(jTTabla.getValueAt(seleccion, 0));
         }
-       
+
     }//GEN-LAST:event_jTTablaMouseClicked
 
     private void jBColgarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBColgarActionPerformed
         try {
             // TODO add your handling code here:
             cli.rechazarLlamada();
+            ip = "";
+            jBColgar.setVisible(false);
         } catch (IOException ex) {
             Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-
     }//GEN-LAST:event_jBColgarActionPerformed
 
     private void jBLlamarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLlamarActionPerformed
-        try {
-            // TODO add your handling code here:
-            IP=ip.substring(4,ip.length());           
-            cli.llamar(ip);
-        } catch (IOException ex) {
-            Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+        if (ip.equals("")) {
+            JOptionPane.showMessageDialog(null, "Por favor seleccione el usuario al que desea llamar ");
+        } else {
+            try {
+                // TODO add your handling code here:
+                IP = ip.substring(4, ip.length());
+                cli.llamar(ip);
+            } catch (IOException ex) {
+                Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_jBLlamarActionPerformed
 
@@ -247,8 +251,8 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
         jLVideo.setIcon(new ImageIcon(data));
         jLVideo.setText("");
     }
-    
-    public JLabel getJLVideo(){
+
+    public JLabel getJLVideo() {
         return jLVideo;
     }
 
@@ -259,16 +263,16 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
     public JButton getColgar() {
         return jBColgar;
     }
-    
-    public void notificacion(String mensaje){
+
+    public void notificacion(String mensaje) {
         JOptionPane.showMessageDialog(null, mensaje);
     }
-    
-    public void setIP(String ip){
-        IP=ip;
+
+    public void setIP(String ip) {
+        IP = ip;
     }
-    
-    public String getIP(){
+
+    public String getIP() {
         return IP;
     }
 }

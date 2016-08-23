@@ -36,13 +36,15 @@ public class Cliente extends Observable implements Runnable {
     private List<String> ips;
     private HiloFrame hf;
     private HiloReceptor hr;
+   private String ipesAux;
 
     public Cliente(Ventana v) throws IOException {
         ips = new ArrayList<>();
-        soc = new Socket(cargarProperties(), 45000);
+        soc = new Socket("25.13.173.95", 45000);
         this.v = v;
         hr = null;
         hr = null;
+        this.ipesAux="";
     }
 
     public List<String> getIps() {
@@ -72,6 +74,7 @@ public class Cliente extends Observable implements Runnable {
             while (true) {
 
                 String aux = listaIps.readLine();
+                
                 if (!aux.equals("")) {
                     ips.clear();
                     String[] ipes = aux.split(",");
@@ -86,24 +89,42 @@ public class Cliente extends Observable implements Runnable {
                         new Thread(hr).start();
                         v.getColgar().setVisible(true);
                     } else if (ipes[0].equals("NO")) {
-                        if (hf != null) {
+                        if(hf != null){
                             hf.setEstado(false);
                             hr.setEstado(false);
-                            limpiarLabel();
-                            v.notificacion("Termino el Streaming");
-                        } else {
+                            v.setJLVideo(new byte[0]);
+                            v.repaint();
+                            v.getColgar().setVisible(false);
+                            v.notificacion("Termino el Streaming");                            
+                        }else{
                             v.notificacion("No contesto");
-                        }
+                        }                        
                     } else {
-                        for (int i = 0; i < ipes.length; i++) {
+                        if(ipesAux.equals("")   ){
+                            ipesAux=aux;
+                            for (int i = 0; i < ipes.length; i++) {
                             if (ipes[i].equals(address.getHostAddress())) {
                             } else {
                                 ips.add(ipes[i]);
                             }
                             Thread.sleep(1000);
                         }
-                        notificar();
+                             notificar();
                         user.println("");
+                        }else if(ipesAux.length()!=aux.length()){
+                            ipesAux=aux;
+                            for (int i = 0; i < ipes.length; i++) {
+                            if (ipes[i].equals(address.getHostAddress())) {
+                            } else {
+                                ips.add(ipes[i]);
+                            }
+                            Thread.sleep(1000);
+                        }
+                             notificar();
+                        user.println("");
+                        }
+                        
+                       
                     }
                 }
             }
@@ -130,22 +151,18 @@ public class Cliente extends Observable implements Runnable {
         new Thread(hr).start();
     }
 
-    public void rechazarLlamada() throws IOException, InterruptedException {
+    public synchronized void rechazarLlamada() throws IOException {
         PrintStream rechazar = new PrintStream(soc.getOutputStream());
-        rechazar.println("NO:" + v.getIP());
+        rechazar.println("NO:"+v.getIP());
         if (hf != null) {
             hr.setEstado(false);
             hf.setEstado(false);
+            v.setJLVideo(new byte[0]);
+            v.repaint();
         } else {
             v.getColgar().setVisible(false);
             v.getContestar().setVisible(false);
         }
-    }
-
-    public synchronized void limpiarLabel() {
-        v.setJLVideo(new byte[0]);
-        v.repaint();
-        v.repaint();
     }
 
     public String cargarProperties() {

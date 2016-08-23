@@ -38,7 +38,6 @@ public class HiloReceptor implements Runnable {
     public void run() {
         try (DatagramSocket socketIn = new DatagramSocket(46000)) {
             while (estado) {
-                System.out.println("Estamos en receptor");
                 byte[] buffer = new byte[15000];
                 DatagramPacket pktIn = new DatagramPacket(buffer, buffer.length);//                        
                 socketIn.receive(pktIn);
