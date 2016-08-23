@@ -34,11 +34,15 @@ public class Cliente extends Observable implements Runnable {
     private Ventana v;
     private Socket soc;
     private List<String> ips;
+    private HiloFrame hf;
+    private HiloReceptor hr;
 
     public Cliente(Ventana v) throws IOException {
         ips = new ArrayList<>();
         soc = new Socket(cargarProperties(), 45000);
         this.v = v;
+        hr = null;
+        hr = null;
     }
 
     public List<String> getIps() {
@@ -63,46 +67,44 @@ public class Cliente extends Observable implements Runnable {
             InetAddress address = InetAddress.getLocalHost();
             PrintStream user = new PrintStream(soc.getOutputStream());
             user.println(address.getHostAddress());
-            BufferedReader listaIps = new BufferedReader(new InputStreamReader(soc.getInputStream()));           
+            BufferedReader listaIps = new BufferedReader(new InputStreamReader(soc.getInputStream()));
 
             while (true) {
 
                 String aux = listaIps.readLine();
                 if (!aux.equals("")) {
                     ips.clear();
-                    System.out.println(aux);
                     String[] ipes = aux.split(",");
                     if (ipes[0].equals("CON")) {
                         v.setIP(ipes[1]);
                         v.getColgar().setVisible(true);
                         v.getContestar().setVisible(true);
                     } else if (ipes[0].equals("OK")) {
-                        HiloFrame hf = new HiloFrame(soc, v.getIP());
+                        hf = new HiloFrame(soc, v.getIP());
                         new Thread(hf).start();
-                        HiloReceptor hr = new HiloReceptor(v);
+                        hr = new HiloReceptor(v);
                         new Thread(hr).start();
                     } else if (ipes[0].equals("NO")) {
-                        v.notificacion("No contesto");
+                        if(hf != null){
+                            hf.setEstado(false);
+                            hr.setEstado(false);
+                            v.setJLVideo(null);
+                            v.notificacion("Termino el Streaming");
+                        }else{
+                            v.notificacion("No contesto");
+                        }                        
                     } else {
-                        System.out.println(ipes[0]);
                         for (int i = 0; i < ipes.length; i++) {
                             if (ipes[i].equals(address.getHostAddress())) {
-
                             } else {
                                 ips.add(ipes[i]);
                             }
-
                             Thread.sleep(1000);
-
                         }
-
                         notificar();
                         user.println("");
-
                     }
-
                 }
-
             }
         } catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
@@ -119,20 +121,26 @@ public class Cliente extends Observable implements Runnable {
 
     public void contestar(String ip) throws IOException {
         PrintStream salida = new PrintStream(soc.getOutputStream());
-        salida.println("OK:" + ip);        
-        v.getColgar().setVisible(false);
+        salida.println("OK:" + ip);
         v.getContestar().setVisible(false);
-        HiloFrame hf = new HiloFrame(soc, ip);
+        hf = new HiloFrame(soc, ip);
         new Thread(hf).start();
-        HiloReceptor hr = new HiloReceptor(v);
+        hr = new HiloReceptor(v);
         new Thread(hr).start();
     }
 
     public void rechazarLlamada() throws IOException {
         PrintStream rechazar = new PrintStream(soc.getOutputStream());
         rechazar.println("NO");
-        v.getColgar().setVisible(false);
-        v.getContestar().setVisible(false);
+        if (hf != null) {
+            hr.setEstado(false);
+            hf.setEstado(false);
+            v.setJLVideo(null);
+        } else {
+            v.getColgar().setVisible(false);
+            v.getContestar().setVisible(false);
+        }
+
     }
 
     public String cargarProperties() {
@@ -146,4 +154,5 @@ public class Cliente extends Observable implements Runnable {
         }
         return null;
     }
+
 }

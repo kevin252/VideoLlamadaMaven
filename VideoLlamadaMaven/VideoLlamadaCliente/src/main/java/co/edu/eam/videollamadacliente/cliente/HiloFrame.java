@@ -27,17 +27,19 @@ public class HiloFrame implements Runnable {
 
     private CameraUtil camara;
     private String ip;
+    private boolean estado;
 
     public HiloFrame(Socket con, String ip) {
         camara = new CameraUtil();
         this.ip = ip;
+        estado = true;
     }
 
     @Override
     public void run() {
         System.out.println(ip);
         camara.initCamera();
-        while (true) {
+        while (estado) {
             byte[] data;
             try {                
                 data = camara.getFrame();                
@@ -58,5 +60,9 @@ public class HiloFrame implements Runnable {
             }
         }
     }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado;
+    }   
 
 }

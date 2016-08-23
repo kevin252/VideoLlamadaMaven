@@ -27,16 +27,17 @@ import javax.swing.ImageIcon;
 public class HiloReceptor implements Runnable {
 
     private Ventana ventana;
+    private boolean estado;
 
     public HiloReceptor(Ventana v) {
         this.ventana = v;
+        this.estado = true;
     }
     
     @Override
     public void run() {
         try (DatagramSocket socketIn = new DatagramSocket(46000)) {
-
-            while (true) {
+            while (estado) {
                 System.out.println("Estamos en receptor");
                 byte[] buffer = new byte[15000];
                 DatagramPacket pktIn = new DatagramPacket(buffer, buffer.length);//                        
@@ -51,4 +52,7 @@ public class HiloReceptor implements Runnable {
 
     }
 
+    public void setEstado(boolean estado) {
+        this.estado = estado;
+    }    
 }

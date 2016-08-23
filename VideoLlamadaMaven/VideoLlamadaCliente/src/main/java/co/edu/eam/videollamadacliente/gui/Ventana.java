@@ -46,7 +46,6 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
             cli.addObserver(this);
             Thread t = new Thread(cli);
             t.start();
-            jTFMensaje.setVisible(false);
             jBActivar.setVisible(false);
             jBColgar.setVisible(false);
         } catch (IOException ex) {
@@ -68,7 +67,6 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTTabla = new javax.swing.JTable();
         jBColgar = new javax.swing.JButton();
-        jTFMensaje = new javax.swing.JTextField();
         jBLlamar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -117,51 +115,39 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLVideo, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 204, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(38, 38, 38))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(196, 196, 196)
+                .addGap(101, 101, 101)
                 .addComponent(jBActivar)
-                .addGap(56, 56, 56)
+                .addGap(107, 107, 107)
                 .addComponent(jBColgar)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(jTFMensaje, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jBLlamar)
-                .addGap(188, 188, 188))
+                .addGap(69, 69, 69))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLVideo, javax.swing.GroupLayout.PREFERRED_SIZE, 453, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLVideo, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
-                        .addComponent(jTFMensaje, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(48, 48, 48))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jBLlamar)
-                        .addGap(58, 58, 58)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLVideo, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jBLlamar)
                     .addComponent(jBActivar)
                     .addComponent(jBColgar))
-                .addGap(65, 65, 65))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBActivarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBActivarActionPerformed
-
         
         try {
             // TODO add your handling code here:
@@ -212,7 +198,6 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
     private javax.swing.JButton jBLlamar;
     private javax.swing.JLabel jLVideo;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTFMensaje;
     private javax.swing.JTable jTTabla;
     // End of variables declaration//GEN-END:variables
 
@@ -271,11 +256,7 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
     public JButton getColgar() {
         return jBColgar;
     }
-
-    public JTextField getMensaje() {
-        return jTFMensaje;
-    }
-
+    
     public void notificacion(String mensaje){
         JOptionPane.showMessageDialog(null, mensaje);
     }
