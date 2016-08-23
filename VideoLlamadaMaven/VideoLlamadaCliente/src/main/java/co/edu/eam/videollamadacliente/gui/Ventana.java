@@ -197,6 +197,8 @@ public class Ventana extends javax.swing.JFrame implements Runnable, Observer {
     private void jBLlamarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBLlamarActionPerformed
         try {
             // TODO add your handling code here:
+            IP=ip.substring(4,ip.length());
+            
             cli.llamar(ip);
         } catch (IOException ex) {
             Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
