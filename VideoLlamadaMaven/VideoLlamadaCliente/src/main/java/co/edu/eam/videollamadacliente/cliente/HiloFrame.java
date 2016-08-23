@@ -37,35 +37,35 @@ public class HiloFrame implements Runnable {
 
     @Override
     public void run() {
+        camara.initCamera();
         while (true) {
             byte[] data;
-
-            try {
-
-                data = camara.getDesktop();
+            try {                
+                data = camara.getFrame();
+                
                 try {
 //crear el paquete
                     try ( // TODO code application logic here
                             //crear el DatagramSocket
                             DatagramSocket udpsoc = new DatagramSocket()) {
-                        
-                        int cont = 1;
-                        
+
+//                        int cont = 1;
+
                         //abrir flujo de salida
-                        PrintStream buffData = new PrintStream(con.getOutputStream());
-                        //enviar el tamaño
-                        buffData.println("TAM:" + data.length);
-                        byte[] jh=new byte[1024];
+//                        PrintStream buffData = new PrintStream(con.getOutputStream());
+//                        //enviar el tamaño
+//                        buffData.println("TAM:" + data.length);
+                        byte[] jh = new byte[15000];
                         //segmentar el arreglo de bytes
-                        while (1024 * cont <= data.length) {
-                            byte[] corte = Arrays.copyOfRange(data, (cont - 1)
-                                    * 1024, cont * 1024);
-                            //creamos el DatagramPacket
-                         DatagramPacket    pkt = new DatagramPacket(corte, 1024, InetAddress.getByName(ip), 46000);
-                            //enviaamos los bytes
-                            udpsoc.send(pkt);
-                            cont++;
-                        }
+//                        while (1024 * cont <= data.length) {
+//                            byte[] corte = Arrays.copyOfRange(data, (cont - 1)
+//                                    * 1024, cont * 1024);
+                        //creamos el DatagramPacket
+                        DatagramPacket pkt = new DatagramPacket(data, data.length, InetAddress.getByName(ip), 46000);
+                        //enviaamos los bytes
+                        udpsoc.send(pkt);
+//                            cont++;
+//                        }
 //                     DatagramPacket   pekt= new DatagramPacket(jh, jh.length);
 //                        udpsoc.receive(pekt);
                     }
@@ -74,7 +74,7 @@ public class HiloFrame implements Runnable {
                 } catch (IOException ex) {
                     Logger.getLogger(HiloFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-               
+
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
