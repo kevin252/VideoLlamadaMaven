@@ -84,12 +84,13 @@ public class Cliente extends Observable implements Runnable {
                         new Thread(hf).start();
                         hr = new HiloReceptor(v);
                         new Thread(hr).start();
+                        v.getColgar().setVisible(true);
                     } else if (ipes[0].equals("NO")) {
                         if(hf != null){
                             hf.setEstado(false);
                             hr.setEstado(false);
                             v.setJLVideo(new byte[0]);
-                            v.getJLVideo().revalidate();
+                            v.repaint();
                             v.notificacion("Termino el Streaming");
                         }else{
                             v.notificacion("No contesto");
@@ -130,14 +131,14 @@ public class Cliente extends Observable implements Runnable {
         new Thread(hr).start();
     }
 
-    public void rechazarLlamada() throws IOException {
+    public synchronized void rechazarLlamada() throws IOException {
         PrintStream rechazar = new PrintStream(soc.getOutputStream());
         rechazar.println("NO:"+v.getIP());
         if (hf != null) {
             hr.setEstado(false);
             hf.setEstado(false);
             v.setJLVideo(new byte[0]);
-            v.getJLVideo().revalidate();
+            v.repaint();
         } else {
             v.getColgar().setVisible(false);
             v.getContestar().setVisible(false);
